@@ -28,7 +28,9 @@ export default async function handler(req: any, res: any) {
         return res.status(500).json({ error: 'Server misconfigured: missing API key' });
     }
 
-    const cacheName = process.env.GEMINI_CACHE_NAME || '';
+    const cacheName25 = process.env.GEMINI_CACHE_NAME_2_5 || process.env.GEMINI_CACHE_NAME || '';
+    const cacheName30 = process.env.GEMINI_CACHE_NAME_3_0 || '';
+    const cacheName = MODEL_NAME === 'gemini-3-flash-preview' ? cacheName30 : cacheName25;
 
     try {
         const { question, verb, tense, currentSentence, currentTranslation } = req.body as VerbQuestionRequest;

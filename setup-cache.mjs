@@ -81,14 +81,21 @@ async function main() {
     });
     console.log(`✅ File uploaded: ${doc.name}`);
 
-    // 5. Create context cache using the uploaded file
-    console.log('🗃️  Creating context cache...');
-    const MODEL_NAME = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-    const cache = await ai.caches.create({
-        model: `models/${MODEL_NAME}`,
-        config: {
-            contents: createUserContent(createPartFromUri(doc.uri, doc.mimeType)),
-            systemInstruction: `You are a CCEA GCSE Spanish teaching assistant with access to the complete CCEA GCSE Spanish Reference Guide. This guide contains:
+    // 5. Create context caches for both models
+    console.log('🗃️  Creating context caches...');
+
+    const models = [
+        { name: 'gemini-2.5-flash', envVar: 'GEMINI_CACHE_NAME_2_5' },
+        { name: 'gemini-3-flash-preview', envVar: 'GEMINI_CACHE_NAME_3_0' }
+    ];
+
+    for (const { name, envVar } of models) {
+        console.log(`\n   Generating cache for ${name}...`);
+        const cache = await ai.caches.create({
+            model: `models/${name}`,
+            config: {
+                contents: createUserContent(createPartFromUri(doc.uri, doc.mimeType)),
+                systemInstruction: `You are a CCEA GCSE Spanish teaching assistant with access to the complete CCEA GCSE Spanish Reference Guide. This guide contains:
 - Past paper questions and answers from real CCEA exams
 - Marking schemes and assessment criteria
 - High-frequency vocabulary lists (verbs, adjectives, connectives)
@@ -97,22 +104,23 @@ async function main() {
 - Question type patterns and answer structures
 
 Use this reference guide as your PRIMARY source for generating authentic, exam-aligned content. When creating examples, model them on real past-paper patterns. When giving tips, reference actual marking criteria. Keep all content age-appropriate for GCSE students (14-16 years old).`,
-            ttl: `${CACHE_TTL_SECONDS}s`,
-            displayName: 'CCEA_Spanish_Reference_Guide',
-        },
-    });
-    console.log(`✅ Cache created: ${cache.name}`);
-    console.log(`   Expires: ${cache.expireTime}`);
+                ttl: `${CACHE_TTL_SECONDS}s`,
+                displayName: `CCEA_Guide_${name}`,
+            },
+        });
+        console.log(`   ✅ Cache created: ${cache.name}`);
+        console.log(`      Expires: ${cache.expireTime}`);
 
-    // 6. Write to .env
-    writeEnvVar('GEMINI_CACHE_NAME', cache.name);
-    console.log(`✅ Written GEMINI_CACHE_NAME to .env`);
+        // 6. Write to .env
+        writeEnvVar(envVar, cache.name);
+        console.log(`   ✅ Written ${envVar} to .env`);
+    }
 
     console.log('');
     console.log('──────────────────────────────────────────────────');
-    console.log('🎉 Done! Restart the dev server to pick up the cache.');
+    console.log('🎉 Done! Both models are now cached. Restart the dev server.');
     console.log(`   Cache TTL: ${CACHE_TTL_SECONDS / 60} minutes`);
-    console.log(`   Re-run this script when the cache expires.`);
+    console.log(`   Re-run this script when the caches expire.`);
 }
 
 main().catch((err) => {
