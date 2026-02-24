@@ -9,7 +9,7 @@ interface VerbExplanationRequest {
     person: string;
 }
 
-const MODEL_NAME = 'gemini-2.5-flash';
+const MODEL_NAME = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
 const SYSTEM_PROMPT_CACHED = `You are a CCEA GCSE Spanish teaching assistant. You have access to the complete CCEA GCSE Spanish Reference Guide in your context, which contains real past-paper questions, marking schemes, high-frequency vocabulary, and knowledge progression blueprints.
 

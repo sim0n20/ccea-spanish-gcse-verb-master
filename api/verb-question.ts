@@ -8,7 +8,7 @@ interface VerbQuestionRequest {
     currentTranslation: string;
 }
 
-const MODEL_NAME = 'gemini-2.5-flash';
+const MODEL_NAME = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
 const SYSTEM_PROMPT = `You are a CCEA GCSE Spanish teaching assistant. Your role is to help students master verb conjugation through contextualised practice.
 
