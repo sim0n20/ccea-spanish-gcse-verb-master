@@ -9,7 +9,7 @@ interface VerbExplanationRequest {
     person: string;
 }
 
-const MODEL_NAME = 'gemini-3-flash-preview';
+const MODEL_NAME = 'gemini-2.5-flash';
 
 const SYSTEM_PROMPT_CACHED = `You are a CCEA GCSE Spanish teaching assistant. You have access to the complete CCEA GCSE Spanish Reference Guide in your context, which contains real past-paper questions, marking schemes, high-frequency vocabulary, and knowledge progression blueprints.
 
@@ -90,7 +90,11 @@ You MUST respond with ONLY valid JSON in this exact format (no markdown, no code
   "contextNote": "a brief CCEA exam tip about this verb/tense (max 2 sentences)"
 }`;
 
-        const config: any = { temperature: 0.9 };
+        const config: any = {
+            temperature: 0.9,
+            maxOutputTokens: 300, // strict limit to prevent runaway generation cost
+            responseMimeType: 'application/json', // native JSON mode saves markdown wrapper tokens
+        };
         if (cacheName) {
             config.cachedContent = cacheName;
         } else {

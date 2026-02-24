@@ -8,7 +8,7 @@ interface VerbQuestionRequest {
     currentTranslation: string;
 }
 
-const MODEL_NAME = 'gemini-3-flash-preview';
+const MODEL_NAME = 'gemini-2.5-flash';
 
 const SYSTEM_PROMPT = `You are a CCEA GCSE Spanish teaching assistant. Your role is to help students master verb conjugation through contextualised practice.
 
@@ -48,7 +48,10 @@ The student asks: "${question}"
 
 Give a helpful, concise answer (max 150 words). Be encouraging and age-appropriate. Use actionable correction if needed. If relevant, give one more example.`;
 
-        const config: any = { temperature: 0.7 };
+        const config: any = {
+            temperature: 0.7,
+            maxOutputTokens: 200, // strictly limit tutor chat length to save tokens
+        };
         if (cacheName) {
             config.cachedContent = cacheName;
         } else {
