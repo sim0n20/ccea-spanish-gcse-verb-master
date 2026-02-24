@@ -6,6 +6,16 @@ const API_BASE = RAW_API_BASE.endsWith('/') ? RAW_API_BASE.slice(0, -1) : RAW_AP
 
 type VerbQuestionResponse = { answer: string };
 
+export async function getAiConfig(): Promise<{ model: string }> {
+    try {
+        const response = await fetch(`${API_BASE}/config`);
+        if (!response.ok) return { model: 'gemini-2.5-flash' };
+        return await response.json();
+    } catch {
+        return { model: 'gemini-2.5-flash' };
+    }
+}
+
 export async function getVerbExplanation(
     verb: Verb,
     tense: Tense,

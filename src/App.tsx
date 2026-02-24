@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { CCEA_VERBS } from './constants';
 import { Tense, GCSETheme, Tier, GrammaticalPerson } from './types';
 import type { VerbExplanation } from './types';
-import { getVerbExplanation } from './services/geminiService';
+import { getVerbExplanation, getAiConfig } from './services/geminiService';
 import VerbDisplay from './components/VerbDisplay';
 
 const App: React.FC = () => {
@@ -11,6 +11,7 @@ const App: React.FC = () => {
   const [currentTheme, setCurrentTheme] = useState<GCSETheme>(GCSETheme.FAMILY);
   const [currentTier, setCurrentTier] = useState<Tier>(Tier.FOUNDATION);
   const [currentPerson, setCurrentPerson] = useState<GrammaticalPerson>(GrammaticalPerson.YO);
+  const [activeModelName, setActiveModelName] = useState<string>('Flash 2.5');
   const [explanation, setExplanation] = useState<VerbExplanation | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +52,33 @@ const App: React.FC = () => {
       speechRef.current.onvoiceschanged = findBestVoices;
     }
   }, [findBestVoices]);
+
+  useEffect(() => {
+    // Disable logging warnings for cleaner console
+    const originalWarn = console.warn;
+    console.warn = (...args) => {
+      if (typeof args[0] === 'string' && args[0].includes('speechSynthesis')) return;
+      originalWarn(...args);
+    };
+
+    // Pre-warm the context cache and fetch config
+    getAiConfig().then((config) => {
+      if (config.model.includes('3-flash')) {
+        setActiveModelName('Flash 3.0');
+      } else {
+        setActiveModelName('Flash 2.5');
+      }
+    });
+
+    // Do a dummy request just to wake up Vercel completely in the background
+    getVerbExplanation(
+      { spanish: 'ser', english: 'to be', category: 'irregular' },
+      Tense.PRESENT,
+      currentTheme,
+      Tier.HIGHER,
+      GrammaticalPerson.YO
+    ).catch(() => { });
+  }, []);
 
   // ─── Speech Controls ─────────────────────────────────────
   const stopAllSpeech = useCallback(() => {
@@ -242,8 +270,9 @@ const App: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             {!loading && (
-              <span className="text-[9px] font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 uppercase tracking-widest">
-                AI Ready
+              <span className="text-[9px] font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 uppercase tracking-widest flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                {activeModelName} Ready
               </span>
             )}
             <div className="text-xs font-bold text-slate-500 bg-slate-800 px-2.5 py-1 rounded-lg">
