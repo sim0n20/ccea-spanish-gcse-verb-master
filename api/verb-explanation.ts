@@ -92,8 +92,6 @@ You MUST respond with ONLY valid JSON in this exact format (no markdown, no code
 
         const config: any = {
             temperature: 0.9,
-            maxOutputTokens: 300, // strict limit to prevent runaway generation cost
-            responseMimeType: 'application/json', // native JSON mode saves markdown wrapper tokens
         };
         if (cacheName) {
             config.cachedContent = cacheName;

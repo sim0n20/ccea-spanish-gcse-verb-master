@@ -50,7 +50,6 @@ Give a helpful, concise answer (max 150 words). Be encouraging and age-appropria
 
         const config: any = {
             temperature: 0.7,
-            maxOutputTokens: 200, // strictly limit tutor chat length to save tokens
         };
         if (cacheName) {
             config.cachedContent = cacheName;
