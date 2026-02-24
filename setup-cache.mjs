@@ -81,10 +81,10 @@ async function main() {
     });
     console.log(`✅ File uploaded: ${doc.name}`);
 
-    // 5. Create cache
+    // 5. Create context cache using the uploaded file
     console.log('🗃️  Creating context cache...');
     const cache = await ai.caches.create({
-        model: MODEL_NAME,
+        model: 'models/gemini-2.5-flash',
         config: {
             contents: createUserContent(createPartFromUri(doc.uri, doc.mimeType)),
             systemInstruction: `You are a CCEA GCSE Spanish teaching assistant with access to the complete CCEA GCSE Spanish Reference Guide. This guide contains:
